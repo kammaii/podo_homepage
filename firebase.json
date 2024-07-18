@@ -1,0 +1,29 @@
+{
+  "flutter": {
+    "platforms": {
+      "dart": {
+        "lib/firebase_options.dart": {
+          "projectId": "podo-49335",
+          "configurations": {
+            "web": "1:1025269170157:web:7bc608d0983b38acfcf1e4"
+          }
+        }
+      }
+    }
+  },
+  "hosting": {
+    "target": "podo-homepage",
+    "public": "build/web",
+    "ignore": [
+      "firebase.json",
+      "**/.*",
+      "**/node_modules/**"
+    ],
+    "rewrites": [
+      {
+        "source": "**",
+        "destination": "/index.html"
+      }
+    ]
+  }
+}

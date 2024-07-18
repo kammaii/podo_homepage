@@ -1,0 +1,15 @@
+{
+  "projects": {
+    "default": "podo-49335"
+  },
+  "targets": {
+    "podo-49335": {
+      "hosting": {
+        "podo-homepage": [
+          "podo-homepage"
+        ]
+      }
+    }
+  },
+  "etags": {}
+}

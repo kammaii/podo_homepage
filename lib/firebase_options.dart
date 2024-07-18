@@ -54,11 +54,12 @@ class DefaultFirebaseOptions {
 
   static const FirebaseOptions web = FirebaseOptions(
     apiKey: 'AIzaSyCYuJcFMihqxeYCzl35TcN2o16IsI9-WCg',
-    appId: '1:1025269170157:web:7bc608d0983b38acfcf1e4',
+    appId: '1:1025269170157:web:14efada846a0dd97fcf1e4',
     messagingSenderId: '1025269170157',
     projectId: 'podo-49335',
     authDomain: 'podo-49335.firebaseapp.com',
     storageBucket: 'podo-49335.appspot.com',
-    measurementId: 'G-TJWQJ3XEW6',
+    measurementId: 'G-5RL1NL4E5D',
   );
+
 }
