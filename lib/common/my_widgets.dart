@@ -1,9 +1,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:podo_homepage/common/values.dart';
-import 'package:podo_homepage/screens/brand.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:podo_homepage/common/values.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 class MyWidgets {
   Widget getText(String text,
@@ -34,7 +33,7 @@ class MyWidgets {
     }
   }
 
-  Widget storeBadge(BuildContext context) {
+  Widget storeBadge(BuildContext context, {bool isPodoKorean = true}) {
     double w = MediaQuery.of(context).size.width < 550 ? 150 : 200;
     double gap = MediaQuery.of(context).size.width < 550 ? 30 : 50;
     return Row(
@@ -42,14 +41,16 @@ class MyWidgets {
       children: [
         GestureDetector(
             onTap: () async {
-              runUrl('https://apps.apple.com/kr/app/podo-korean/id6451487431');
+              isPodoKorean ?
+              runUrl('https://apps.apple.com/kr/app/podo-korean/id6451487431') : runUrl('https://apps.apple.com/us/app/podo-words/id1578269591');
             },
             child: Image.asset("assets/images/apple.png",
                 width: w)),
         SizedBox(width: gap),
         GestureDetector(
             onTap: () async {
-              runUrl('https://play.google.com/store/apps/details?id=net.awesomekorean.newpodo&hl=en_US');
+              isPodoKorean ?
+              runUrl('https://play.google.com/store/apps/details?id=net.awesomekorean.newpodo&hl=en_US') : runUrl('https://play.google.com/store/apps/details?id=net.awesomekorean.podo_words&hl=en_US');
             },
             child: Image.asset("assets/images/google.png",
                 width: MediaQuery.of(context).size.width < 550 ? 150 : 200)),
@@ -116,4 +117,104 @@ class MyWidgets {
                   ],
           );
   }
+
+  Widget downloadNow(BuildContext context) {
+    return Column(
+      children: [
+        MyWidgets().getText(texts["home_54"]!, isBold: true, fontSize: fontSizeBig, fontColor: darkPurple),
+        heightSpace,
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Icon(Icons.arrow_circle_down, color: darkPurple),
+            widthSpace,
+            MyWidgets()
+                .getText(texts["home_55"]!, isBold: true, fontSize: fontSizeBig, fontColor: darkPurple),
+            widthSpace,
+            const Icon(Icons.arrow_circle_down, color: darkPurple),
+          ],
+        ),
+        heightSpace,
+        MyWidgets().storeBadge(context),
+        heightSpace,
+        Image.asset('assets/images/podo_logo.png', width: 300),
+      ],
+    );
+  }
+
+  Widget footerLeft() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        MyWidgets().getText('ㆍ Awesome Korean | Jeongwoo Park', fontColor: Colors.white, fontSize: 10),
+        MyWidgets().getText('ㆍ Contact | akorean.help@gmail.com', fontColor: Colors.white, fontSize: 10),
+        MyWidgets().getText('ㆍ Business Registration Number | 240-14-01074',
+            fontColor: Colors.white, fontSize: 10),
+        MyWidgets().getText('ㆍ Mail order sales Registration Number | 2019-대전중구-0212',
+            fontColor: Colors.white, fontSize: 10),
+        // const SizedBox(height: 10),
+        // GestureDetector(
+        //     onTap: () {},
+        //     child: MyWidgets().getText('ㆍ Terms of Service', fontColor: Colors.white, fontSize: 10)),
+        GestureDetector(
+            onTap: () async {
+              runUrl('https://www.podokorean.com/privacyPolicy.html');
+            },
+            child: MyWidgets().getText('ㆍ Privacy Policy', fontColor: Colors.white, fontSize: 10, isBold: true)),
+      ],
+    );
+  }
+
+  Widget footerRight(Function(int) changePage) {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Row(
+          children: [
+            IconButton(onPressed: () async {
+              runUrl('https://www.instagram.com/koreanwithpodo/');
+            }, icon: const Icon(FontAwesomeIcons.instagram), color: Colors.white),
+            IconButton(onPressed: () async {
+              runUrl('https://www.facebook.com/koreanwithpodo');
+            }, icon: const Icon(FontAwesomeIcons.facebook), color: Colors.white),
+            IconButton(onPressed: () async {
+              runUrl('https://www.reddit.com/r/podokorean/?feed=home');
+            }, icon: const Icon(FontAwesomeIcons.reddit), color: Colors.white),
+            IconButton(onPressed: () async {
+              runUrl('https://blog.podokorean.com');
+            }, icon: const Icon(FontAwesomeIcons.blogger), color: Colors.white),
+            IconButton(onPressed: () {
+              changePage(6);
+            }, icon: const Icon(Icons.email), color: Colors.white),
+          ],
+        ),
+        const SizedBox(height: 10),
+        MyWidgets().getText('© 2023 Awesome Korean, All rights reserved.', fontColor: Colors.white, fontSize: 10),
+      ],
+    );
+  }
+
+  Widget footer (BuildContext context, Function(int) changePage) {
+    return Container(
+        color: darkPurple,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 50),
+          child: MediaQuery.of(context).size.width < 650 ? Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              footerLeft(),
+              const SizedBox(height: 20),
+              footerRight(changePage)
+            ],
+          ) : Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              footerLeft(),
+              const SizedBox(width: 20),
+              footerRight(changePage)
+            ],
+          ),
+        ));
+  }
+
 }

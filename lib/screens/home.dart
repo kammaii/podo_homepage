@@ -1,30 +1,24 @@
 import 'dart:async';
 import 'package:card_swiper/card_swiper.dart';
-import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/painting.dart';
-import 'package:flutter/rendering.dart';
-import 'package:flutter/widgets.dart';
-import 'package:get/get_rx/get_rx.dart';
-import 'package:podo_homepage/common/my_widgets.dart';
-import 'package:podo_homepage/main.dart';
 import 'package:get/get.dart';
-import 'package:podo_homepage/screens/footer.dart';
+import 'package:podo_homepage/common/my_widgets.dart';
 import 'package:podo_homepage/common/values.dart';
+import 'package:podo_homepage/main.dart';
 
-final controller = Get.find<HomeController>();
+final controller = Get.find<MainController>();
 List<ReviewItem> reviewItems = [
-  ReviewItem("Jean Reimbold", 5, texts["home_31"]!),
-  ReviewItem("aleksa 88", 5, texts["home_32"]!),
-  ReviewItem("Joenn2609", 5, texts["home_33"]!),
-  ReviewItem("Nikola", 5, texts["home_34"]!),
-  ReviewItem("Ирина Ирина", 5, texts["home_35"]!),
-  ReviewItem("Dr Shantoux", 5, texts["home_36"]!),
-  ReviewItem("Kailane Silva", 5, texts["home_37"]!),
-  ReviewItem("dynamo samaha", 5, texts["home_38"]!),
-  ReviewItem("Oratile Miyelani", 4, texts["home_39"]!),
-  ReviewItem("Margaret Abang", 4, texts["home_40"]!),
+  ReviewItem("Jean Reimbold", 5, texts["home_32"]!),
+  ReviewItem("aleksa 88", 5, texts["home_33"]!),
+  ReviewItem("Joenn2609", 5, texts["home_34"]!),
+  ReviewItem("Nikola", 5, texts["home_35"]!),
+  ReviewItem("Ирина Ирина", 5, texts["home_36"]!),
+  ReviewItem("Dr Shantoux", 5, texts["home_37"]!),
+  ReviewItem("Kailane Silva", 5, texts["home_38"]!),
+  ReviewItem("dynamo samaha", 5, texts["home_39"]!),
+  ReviewItem("Oratile Miyelani", 4, texts["home_40"]!),
+  ReviewItem("Margaret Abang", 4, texts["home_41"]!),
 ];
 
 List<FaqItem> faqItems = [
@@ -140,7 +134,7 @@ Widget _review(String name, int star, String review) {
   );
 }
 
-ExpansionPanel faqPanel(FaqItem item) {
+ExpansionPanel faqPanel(FaqItem item, {String? linkTitle, Function()? fn}) {
   return ExpansionPanel(
     canTapOnHeader: true,
     isExpanded: item.isExpanded,
@@ -161,6 +155,13 @@ ExpansionPanel faqPanel(FaqItem item) {
             padding: const EdgeInsets.all(10),
             child: MyWidgets().getText(item.content, textAlign: TextAlign.start, fontHeight: 2),
           ),
+          linkTitle != null
+              ? Row(
+                  children: [
+                    TextButton(onPressed: fn, child: Text(linkTitle)),
+                  ],
+                )
+              : const SizedBox.shrink()
         ],
       ),
     ),
@@ -173,8 +174,7 @@ closePanels() {
   }
 }
 
-Widget home(BuildContext context) {
-
+Widget home(BuildContext context, Function(int) changePage) {
   return Column(
     children: [
       getContainer(
@@ -234,6 +234,30 @@ Widget home(BuildContext context) {
           Column(
             children: [
               MyWidgets().getText(texts["home_16"]!, fontSize: fontSizeBig, fontColor: darkPurple),
+              RichText(
+                textAlign: TextAlign.center,
+                text: TextSpan(
+                  children: [
+                    TextSpan(
+                      text: texts["home_16_1"],
+                      style: const TextStyle(
+                        fontFamily: 'EnglishFont',
+                        fontSize: fontSizeBig,
+                        color: darkPurple,
+                        fontWeight: FontWeight.bold,
+                      )
+                    ),
+                    TextSpan(
+                        text: texts["home_16_2"],
+                        style: const TextStyle(
+                          fontFamily: 'EnglishFont',
+                          fontSize: fontSizeBig,
+                          color: darkPurple,
+                        )
+                    ),
+                  ]
+                ),
+              ),
               heightSpace,
               MyWidgets().getText(texts["home_17"]!, isBold: true, fontSize: fontSizeBig, fontColor: darkPurple),
               heightSpace,
@@ -312,7 +336,9 @@ Widget home(BuildContext context) {
               heightSpace,
               ElevatedButton(
                   style: ElevatedButton.styleFrom(backgroundColor: darkPurple, elevation: 5),
-                  onPressed: () {},
+                  onPressed: () {
+                    changePage(2);
+                  },
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
@@ -349,7 +375,7 @@ Widget home(BuildContext context) {
                 child: ListView.builder(
                   controller: controller.mc,
                   scrollDirection: Axis.horizontal,
-                  itemCount: 10000,
+                  itemCount: 1000,
                   itemBuilder: (context, i) {
                     int index = i % 10;
                     ReviewItem item = reviewItems[index];
@@ -367,7 +393,7 @@ Widget home(BuildContext context) {
             children: [
               MyWidgets().getText(texts["home_42"]!, isBold: true, fontSize: fontSizeBig, fontColor: darkPurple),
               heightSpace,
-              GetBuilder<HomeController>(builder: (_) {
+              GetBuilder<MainController>(builder: (_) {
                 double p = MediaQuery.of(context).size.width < 740 ? 10 : 50;
                 return Padding(
                   padding: EdgeInsets.symmetric(horizontal: p),
@@ -379,10 +405,16 @@ Widget home(BuildContext context) {
                     },
                     children: [
                       faqPanel(faqItems[0]),
-                      faqPanel(faqItems[1]),
-                      faqPanel(faqItems[2]),
+                      faqPanel(faqItems[1], linkTitle: texts["home_56"], fn: () {
+                        changePage(1);
+                      }),
+                      faqPanel(faqItems[2], linkTitle: texts["home_56"], fn: () {
+                        changePage(1);
+                      }),
                       faqPanel(faqItems[3]),
-                      faqPanel(faqItems[4]),
+                      faqPanel(faqItems[4], linkTitle: texts["home_57"], fn: () {
+                        changePage(4);
+                      }),
                     ],
                   ),
                 );
@@ -394,68 +426,18 @@ Widget home(BuildContext context) {
                   MyWidgets().getText(texts["home_53"]!, isBold: true, fontColor: darkPurple),
                   widthSpace,
                   IconButton(
-                      onPressed: () {}, icon: const Icon(Icons.arrow_circle_right_outlined, color: darkPurple)),
+                      onPressed: () {
+                        changePage(6);
+                      },
+                      icon: const Icon(Icons.arrow_circle_right_outlined, color: darkPurple)),
                 ],
               )
             ],
           )),
-      getContainer(
-          bgPurple,
-          Column(
-            children: [
-              MyWidgets().getText(texts["home_54"]!, fontSize: fontSizeBig, fontColor: darkPurple),
-              heightSpace,
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Icon(Icons.arrow_circle_down, color: darkPurple),
-                  widthSpace,
-                  MyWidgets()
-                      .getText(texts["home_55"]!, isBold: true, fontSize: fontSizeBig, fontColor: darkPurple),
-                  widthSpace,
-                  const Icon(Icons.arrow_circle_down, color: darkPurple),
-                ],
-              ),
-              heightSpace,
-              MyWidgets().storeBadge(context),
-              heightSpace,
-              Image.asset('assets/images/podo_logo.png', width: 300),
-            ],
-          )),
-      Footer().footer(context),
+      getContainer(bgPurple, MyWidgets().downloadNow(context)),
+      MyWidgets().footer(context, changePage),
     ],
   );
-}
-
-class HomeController extends GetxController {
-  ScrollController sc = ScrollController();
-
-  ScrollController mc = ScrollController();
-  late Timer timer;
-
-  @override
-  void onInit() {
-    super.onInit();
-    timer = Timer.periodic(const Duration(milliseconds: 100), (timer) {
-      if (mc.hasClients) {
-        final maxScrollExtent = mc.position.maxScrollExtent;
-        final pixels = mc.position.pixels;
-
-        if (pixels >= maxScrollExtent) {
-          mc.jumpTo(0);
-        }
-        mc.animateTo(pixels + 10, duration: const Duration(milliseconds: 100), curve: Curves.linear);
-      }
-    });
-  }
-
-  @override
-  void onClose() {
-    sc.dispose();
-    mc.dispose();
-    timer.cancel();
-    super.onClose();
-  }
 }
 
 class ReviewItem {

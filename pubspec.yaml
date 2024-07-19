@@ -43,7 +43,8 @@ dependencies:
   card_swiper: ^3.0.1
   url_launcher: ^6.3.0
   timelines: ^0.1.0
-
+  font_awesome_flutter: ^10.7.0
+  http: ^1.2.2
 
 dev_dependencies:
   flutter_test:

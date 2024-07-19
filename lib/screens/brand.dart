@@ -2,11 +2,10 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:podo_homepage/common/my_widgets.dart';
+import 'package:podo_homepage/common/values.dart';
 import 'package:podo_homepage/main.dart';
-import 'package:podo_homepage/screens/footer.dart';
 import 'package:responsive_framework/responsive_wrapper.dart';
 import 'package:timelines/timelines.dart';
-import 'package:podo_homepage/common/values.dart';
 
 
 List<TimelineContent> timelines = [
@@ -80,7 +79,7 @@ Widget circleContainer({IconData? icon, double h = 50, double w = 50, Color bgCo
   );
 }
 
-Widget brand(BuildContext context) {
+Widget brand(BuildContext context, Function(int) changePage) {
   return Column(
     children: [
       getContainer(
@@ -152,15 +151,17 @@ Widget brand(BuildContext context) {
           Colors.white,
           Column(
             children: [
-              MyWidgets()
-                  .getText(texts["brand_14"]!, isBold: true, fontColor: darkPurple, fontSize: fontSizeMiddle),
+              MyWidgets().getText(texts["brand_14"]!, isBold: true, fontColor: darkPurple),
               heightSpace,
-              MyWidgets().getText(texts["brand_15"]!, fontColor: darkPurple),
+              MyWidgets().getText(texts["brand_14_1"]!, isBold: true, fontColor: darkPurple),
               heightSpace,
-              MyWidgets()
-                  .getText(texts["brand_16"]!, isBold: true, fontColor: darkPurple, fontSize: fontSizeMiddle),
+              MyWidgets().getText(texts["brand_15"]!, isBold: true, fontSize:fontSizeBig, fontColor: darkPurple),
+              const Divider(height: 80),
+              MyWidgets().getText(texts["brand_16"]!, isBold: true, fontColor: darkPurple),
               heightSpace,
-              MyWidgets().getText(texts["brand_17"]!, fontColor: darkPurple),
+              MyWidgets().getText(texts["brand_16_1"]!, isBold: true, fontColor: darkPurple),
+              heightSpace,
+              MyWidgets().getText(texts["brand_17"]!, isBold: true, fontSize:fontSizeBig, fontColor: darkPurple),
             ],
           )),
       getContainer(
@@ -250,7 +251,7 @@ Widget brand(BuildContext context) {
                 ],
               ),
             ),
-            MediaQuery.of(context).size.width < 800
+            MediaQuery.of(context).size.width < 945
                 ? const SizedBox.shrink()
                 : Expanded(
                     child: SizedBox(
@@ -283,28 +284,8 @@ Widget brand(BuildContext context) {
       ),
       getContainer(
           bgPurple,
-          Column(
-            children: [
-              MyWidgets().getText(texts["brand_41"]!, isBold: true, fontSize: fontSizeBig, fontColor: darkPurple),
-              heightSpace,
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Icon(Icons.arrow_circle_down, color: darkPurple),
-                  widthSpace,
-                  MyWidgets()
-                      .getText(texts["brand_42"]!, isBold: true, fontSize: fontSizeBig, fontColor: darkPurple),
-                  widthSpace,
-                  const Icon(Icons.arrow_circle_down, color: darkPurple),
-                ],
-              ),
-              heightSpace,
-              MyWidgets().storeBadge(context),
-              heightSpace,
-              Image.asset('assets/images/podo_logo.png', width: 300)
-            ],
-          )),
-      Footer().footer(context),
+          MyWidgets().downloadNow(context)),
+      MyWidgets().footer(context, changePage),
     ],
   );
 }
