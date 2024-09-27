@@ -185,6 +185,8 @@ Widget home(BuildContext context, Function(int) changePage) {
               heightSpace,
               MyWidgets().getText(texts["home_2"]!, fontColor: Colors.white),
               heightSpace,
+              MyWidgets().storeBadge(context),
+              heightSpace,
               IconButton(
                   onPressed: () {
                     scrollDown();
@@ -259,7 +261,9 @@ Widget home(BuildContext context, Function(int) changePage) {
                 ),
               ),
               heightSpace,
-              MyWidgets().getText(texts["home_17"]!, isBold: true, fontSize: fontSizeBig, fontColor: darkPurple),
+              MyWidgets().highlightText(texts["home_17"]!),
+              heightSpace,
+              MyWidgets().getText(texts["home_17_1"]!, fontSize: fontSizeBig, fontColor: darkPurple),
               heightSpace,
               MyWidgets().getText(texts["home_18"]!, fontColor: darkPurple),
               MyWidgets().getText(texts["home_19"]!, fontColor: darkPurple),

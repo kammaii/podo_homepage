@@ -44,16 +44,14 @@ class MyWidgets {
               isPodoKorean ?
               runUrl('https://apps.apple.com/kr/app/podo-korean/id6451487431') : runUrl('https://apps.apple.com/us/app/podo-words/id1578269591');
             },
-            child: Image.asset("assets/images/apple.png",
-                width: w)),
+            child: Image.asset("assets/images/apple.png", width: w-10)),
         SizedBox(width: gap),
         GestureDetector(
             onTap: () async {
               isPodoKorean ?
               runUrl('https://play.google.com/store/apps/details?id=net.awesomekorean.newpodo&hl=en_US') : runUrl('https://play.google.com/store/apps/details?id=net.awesomekorean.podo_words&hl=en_US');
             },
-            child: Image.asset("assets/images/google.png",
-                width: MediaQuery.of(context).size.width < 550 ? 150 : 200)),
+            child: Image.asset("assets/images/google.png", width: w)),
       ],
     );
   }
@@ -116,6 +114,23 @@ class MyWidgets {
                     roundedContainer(CupertinoIcons.app_badge_fill, texts["brand_10"]!, bgColor),
                   ],
           );
+  }
+
+  Widget highlightText(String text) {
+    return Stack(
+      children: [
+        Positioned(
+          bottom: 5,
+          left: 0,
+          right: 0,
+          child: Container(
+            height: 20,
+            color: Colors.yellow.withOpacity(0.5),
+          ),
+        ),
+        MyWidgets().getText(text, isBold: true, fontColor: darkPurple, fontSize: fontSizeBig)
+      ],
+    );
   }
 
   Widget downloadNow(BuildContext context) {

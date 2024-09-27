@@ -47,22 +47,6 @@ Widget roundedContainer(IconData icon, String title, {Color bgColor = bgPurple})
   );
 }
 
-Widget highlightText(String text) {
-  return Stack(
-    children: [
-      Positioned(
-        bottom: 5,
-        left: 0,
-        right: 0,
-        child: Container(
-          height: 20,
-          color: Colors.yellow.withOpacity(0.5),
-        ),
-      ),
-      MyWidgets().getText(text, isBold: true, fontColor: darkPurple, fontSize: fontSizeBig)
-    ],
-  );
-}
 
 Widget circleContainer({IconData? icon, double h = 50, double w = 50, Color bgColor = bgPurple}) {
   return Padding(
@@ -218,7 +202,7 @@ Widget brand(BuildContext context, Function(int) changePage) {
               MyWidgets()
                   .getText(texts["brand_27"]!, isBold: true, fontColor: darkPurple, fontSize: fontSizeMiddle),
               heightSpace,
-              highlightText(texts["brand_28"]!),
+              MyWidgets().highlightText(texts["brand_28"]!),
             ],
           )),
       Container(
@@ -238,9 +222,9 @@ Widget brand(BuildContext context, Function(int) changePage) {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Expanded(child: Center(child: highlightText(texts["brand_37"]!))),
+                      Expanded(child: Center(child: MyWidgets().highlightText(texts["brand_37"]!))),
                       circleContainer(w: 10, h: 10, bgColor: darkPurple),
-                      Expanded(child: Center(child: highlightText(texts["brand_38"]!))),
+                      Expanded(child: Center(child: MyWidgets().highlightText(texts["brand_38"]!))),
                     ],
                   ),
                   heightSpace,

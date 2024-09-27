@@ -15,6 +15,7 @@ import 'package:url_launcher/url_launcher.dart';
 import 'firebase_options.dart';
 import 'package:responsive_framework/responsive_framework.dart';
 import 'package:get/get.dart';
+import 'package:firebase_analytics/firebase_analytics.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -47,6 +48,8 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    FirebaseAnalytics.instance;
+
     return GetMaterialApp(
       title: 'Podo Korean',
       theme: ThemeData(
