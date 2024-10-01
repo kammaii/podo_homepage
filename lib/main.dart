@@ -100,18 +100,21 @@ class _MyHomePageState extends State<MyHomePage> {
 
   Widget menuTitle(int index, String title) {
     Color color = controller.selectedIndex == index ? darkPurple : Colors.black;
-    return GestureDetector(
-        onTap: () {
-          if (index == 5) {
-            openBlog();
-          } else {
-            changePage(index);
-          }
-        },
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 10),
-          child: MyWidgets().getText(title, isBold: true, fontColor: color),
-        ));
+    return MouseRegion(
+      cursor: SystemMouseCursors.click,
+      child: GestureDetector(
+          onTap: () {
+            if (index == 5) {
+              openBlog();
+            } else {
+              changePage(index);
+            }
+          },
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 10),
+            child: MyWidgets().getText(title, isBold: true, fontColor: color),
+          )),
+    );
   }
 
   List<Widget> getMenu(BuildContext context) {

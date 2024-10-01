@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:podo_homepage/common/values.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -39,19 +40,25 @@ class MyWidgets {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        GestureDetector(
-            onTap: () async {
-              isPodoKorean ?
-              runUrl('https://apps.apple.com/kr/app/podo-korean/id6451487431') : runUrl('https://apps.apple.com/us/app/podo-words/id1578269591');
-            },
-            child: Image.asset("assets/images/apple.png", width: w-10)),
+        MouseRegion(
+          cursor: SystemMouseCursors.click,
+          child: GestureDetector(
+              onTap: () async {
+                isPodoKorean ?
+                runUrl('https://apps.apple.com/kr/app/podo-korean/id6451487431') : runUrl('https://apps.apple.com/us/app/podo-words/id1578269591');
+              },
+              child: Image.asset("assets/images/apple.png", width: w-10)),
+        ),
         SizedBox(width: gap),
-        GestureDetector(
-            onTap: () async {
-              isPodoKorean ?
-              runUrl('https://play.google.com/store/apps/details?id=net.awesomekorean.newpodo&hl=en_US') : runUrl('https://play.google.com/store/apps/details?id=net.awesomekorean.podo_words&hl=en_US');
-            },
-            child: Image.asset("assets/images/google.png", width: w)),
+        MouseRegion(
+          cursor: SystemMouseCursors.click,
+          child: GestureDetector(
+              onTap: () async {
+                isPodoKorean ?
+                runUrl('https://play.google.com/store/apps/details?id=net.awesomekorean.newpodo&hl=en_US') : runUrl('https://play.google.com/store/apps/details?id=net.awesomekorean.podo_words&hl=en_US');
+              },
+              child: Image.asset("assets/images/google.png", width: w)),
+        ),
       ],
     );
   }
@@ -204,7 +211,7 @@ class MyWidgets {
           ],
         ),
         const SizedBox(height: 10),
-        MyWidgets().getText('© 2023 Awesome Korean, All rights reserved.', fontColor: Colors.white, fontSize: 10),
+        MyWidgets().getText('Copyright 2023 Awesome Korean, All rights reserved.', fontColor: Colors.white, fontSize: 10),
       ],
     );
   }
