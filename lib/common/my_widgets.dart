@@ -199,9 +199,9 @@ class MyWidgets {
             IconButton(onPressed: () async {
               runUrl('https://www.facebook.com/koreanwithpodo');
             }, icon: const Icon(FontAwesomeIcons.facebook), color: Colors.white),
-            IconButton(onPressed: () async {
-              runUrl('https://www.reddit.com/r/podokorean/?feed=home');
-            }, icon: const Icon(FontAwesomeIcons.reddit), color: Colors.white),
+            // IconButton(onPressed: () async {
+            //   runUrl('https://www.reddit.com/r/podokorean/?feed=home');
+            // }, icon: const Icon(FontAwesomeIcons.reddit), color: Colors.white),
             IconButton(onPressed: () async {
               runUrl('https://blog.podokorean.com');
             }, icon: const Icon(FontAwesomeIcons.blogger), color: Colors.white),
