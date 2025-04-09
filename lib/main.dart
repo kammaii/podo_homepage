@@ -16,6 +16,7 @@ import 'firebase_options.dart';
 import 'package:responsive_framework/responsive_framework.dart';
 import 'package:get/get.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
+import 'package:flutter_web_plugins/url_strategy.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -23,32 +24,33 @@ void main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
   Get.put(MainController());
+  setUrlStrategy(PathUrlStrategy());
   runApp(const MyApp());
-
-  // await EasyLocalization.ensureInitialized();
-  // String langCode = html.window.navigator.language.split('-')[0];
-  // print('Browser Language: $langCode');
-  // const supportedLanguages = ['en', 'es', 'fr', 'de', 'pt', 'id', 'ru'];
-  // if(!supportedLanguages.contains(langCode)) {
-  //   langCode = 'en';
-  // }
-  // runApp(EasyLocalization(supportedLocales: const [
-  //   Locale('en'),
-  //   Locale('es'),
-  //   Locale('fr'),
-  //   Locale('de'),
-  //   Locale('pt'),
-  //   Locale('id'),
-  //   Locale('ru'),
-  // ], path: 'assets/translations',startLocale: Locale(langCode), fallbackLocale: const Locale('en'), child: MyApp()));
 }
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
+  static const HOME = 'Home';
+  static const BRAND_STORY = 'Brand Story';
+  static const APP_PREVIEW = 'App Preview';
+  static const CURRICULUM = 'Curriculum';
+  static const PREMIUM = 'Premium';
+  static const BLOG = 'Blog';
+  static const CONTACT = 'Contact';
+
   @override
   Widget build(BuildContext context) {
     FirebaseAnalytics.instance;
+
+    GetPage getPage(String name) {
+      String routeName = name.replaceAll(' ', '').toLowerCase();
+      routeName = '/$routeName';
+      if (name == HOME) {
+        routeName = '/';
+      }
+      return GetPage(name: routeName, page: () => MyHomePage(pageName: name), transition: Transition.noTransition);
+    }
 
     return GetMaterialApp(
       title: 'Podo Korean',
@@ -67,16 +69,24 @@ class MyApp extends StatelessWidget {
           ResponsiveBreakpoint.autoScale(1200, name: DESKTOP),
         ],
       ),
-      home: MyHomePage(),
-      // localizationsDelegates: context.localizationDelegates,
-      // supportedLocales: context.supportedLocales,
-      // locale: context.locale,
+      getPages: [
+        getPage(HOME),
+        getPage(BRAND_STORY),
+        getPage(APP_PREVIEW),
+        getPage(CURRICULUM),
+        getPage(PREMIUM),
+        getPage(BLOG),
+        getPage(CONTACT),
+      ],
+      initialRoute: '/',
     );
   }
 }
 
 class MyHomePage extends StatefulWidget {
-  MyHomePage({super.key});
+  MyHomePage({required this.pageName, super.key});
+
+  String pageName;
 
   @override
   State<MyHomePage> createState() => _MyHomePageState();
@@ -84,30 +94,37 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   final controller = Get.find<MainController>();
+  ScrollController sc = ScrollController();
 
-  void changePage(int pageIndex) {
-    controller.selectedIndex = pageIndex;
-    setState(() {
-      if (pageIndex == 0) {
-        controller.sc.jumpTo(controller.homeScrollOffset);
-      } else if (pageIndex == 1) {
-        controller.sc.jumpTo(controller.brandScrollOffset);
-      } else {
-        controller.sc.jumpTo(0);
-      }
-    });
+  void changePage(String title, {bool shouldOff = false}) {
+    controller.selectedPage = title;
+    String route = title.replaceAll(' ', '').toLowerCase();
+    route = '/$route';
+    if (title == MyApp.HOME) {
+      route = '/';
+    }
+    if (shouldOff) {
+      Get.offNamed(route);
+    } else {
+      Get.toNamed(route);
+    }
   }
 
-  Widget menuTitle(int index, String title) {
-    Color color = controller.selectedIndex == index ? darkPurple : Colors.black;
+  Widget menuTitle(String title) {
+    Color color = controller.selectedPage == title ? darkPurple : Colors.black;
     return MouseRegion(
       cursor: SystemMouseCursors.click,
       child: GestureDetector(
           onTap: () {
-            if (index == 5) {
+            if (title == MyApp.BLOG) {
               openBlog();
             } else {
-              changePage(index);
+              if (title == MyApp.HOME || title == MyApp.BRAND_STORY || title == MyApp.APP_PREVIEW) {
+                controller.showFreeWorkbook = true;
+              } else {
+                controller.showFreeWorkbook = false;
+              }
+              changePage(title, shouldOff: true);
             }
           },
           child: Padding(
@@ -119,28 +136,28 @@ class _MyHomePageState extends State<MyHomePage> {
 
   List<Widget> getMenu(BuildContext context) {
     List<Widget> menuList = [];
-    menuList.add(menuTitle(0, texts["main_1"]!));
-    menuList.add(menuTitle(1, texts["main_2"]!));
-    menuList.add(menuTitle(2, texts["main_3"]!));
-    menuList.add(menuTitle(3, texts["main_4"]!));
-    menuList.add(menuTitle(4, texts["main_5"]!));
-    menuList.add(menuTitle(5, texts["main_6"]!));
-    menuList.add(menuTitle(6, texts["main_7"]!));
+    menuList.add(menuTitle(MyApp.HOME));
+    menuList.add(menuTitle(MyApp.BRAND_STORY));
+    menuList.add(menuTitle(MyApp.APP_PREVIEW));
+    menuList.add(menuTitle(MyApp.CURRICULUM));
+    menuList.add(menuTitle(MyApp.PREMIUM));
+    menuList.add(menuTitle(MyApp.BLOG));
+    menuList.add(menuTitle(MyApp.CONTACT));
     return menuList;
   }
 
-  ListTile getMenuTile(BuildContext context, IconData icon, String title, int index) {
+  ListTile getMenuTile(BuildContext context, IconData icon, String title) {
     return ListTile(
-      leading: Icon(icon, color: controller.selectedIndex == index ? Colors.white : darkPurple),
-      title: MyWidgets().getText(texts[title]!,
-          fontColor: controller.selectedIndex == index ? Colors.white : darkPurple, isBold: true),
-      selected: controller.selectedIndex == index,
+      leading: Icon(icon, color: controller.selectedPage == title ? Colors.white : darkPurple),
+      title: MyWidgets()
+          .getText(title, fontColor: controller.selectedPage == title ? Colors.white : darkPurple, isBold: true),
+      selected: controller.selectedPage == title,
       onTap: () {
-        if (index == 5) {
+        if (title == MyApp.BLOG) {
           openBlog();
         } else {
           Navigator.pop(context);
-          changePage(index);
+          changePage(title, shouldOff: true);
         }
       },
       selectedTileColor: darkPurple,
@@ -157,59 +174,107 @@ class _MyHomePageState extends State<MyHomePage> {
     }
   }
 
+
   @override
   Widget build(BuildContext context) {
-    List<Widget> pages = [
-      home(context, changePage),
-      brand(context, changePage),
-      preview(context, changePage),
-      curriculum(context, changePage),
-      premium(context, changePage),
-      brand(context, changePage),
-      contact(context, changePage),
-    ];
+    controller.selectedPage = widget.pageName;
+    Widget getPage() {
+      Widget widget = home(context, changePage);
+      String pageName = controller.selectedPage;
+      switch (pageName) {
+        case MyApp.HOME:
+          widget = home(context, changePage);
+          break;
+        case MyApp.BRAND_STORY:
+          widget = brand(context, changePage);
+          break;
+        case MyApp.APP_PREVIEW:
+          widget = preview(context, changePage);
+          break;
+        case MyApp.CURRICULUM:
+          widget = curriculum(context, changePage);
+          break;
+        case MyApp.PREMIUM:
+          widget = premium(context, changePage);
+          break;
+        case MyApp.CONTACT:
+          widget = contact(context, changePage);
+          break;
+      }
+      return widget;
+    }
+
+    sc = ScrollController();
+    controller.sc = sc;
+    sc.addListener(() {
+      if (controller.selectedPage == MyApp.HOME) {
+        controller.homeScrollOffset = sc.offset;
+      } else if (controller.selectedPage == MyApp.BRAND_STORY) {
+        controller.brandScrollOffset = sc.offset;
+      }
+    });
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        if (controller.selectedPage == MyApp.HOME) {
+          sc.jumpTo(controller.homeScrollOffset);
+        } else if (controller.selectedPage == MyApp.BRAND_STORY) {
+          sc.jumpTo(controller.brandScrollOffset);
+        } else {
+          sc.jumpTo(0);
+        }
+      }
+    });
+
 
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
         backgroundColor: Colors.white,
-        title: GestureDetector(
-          onTap: () {
-            changePage(0);
-            controller.sc.jumpTo(0);
-          },
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Row(
-                  children: [
-                    Image.asset('assets/images/podo_logo.png', width: 100, height: 50),
-                    MyWidgets().getText('Podo Korean', isBold: true),
-                  ],
+        title: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              MouseRegion(
+                cursor: SystemMouseCursors.click,
+                child: GestureDetector(
+                  onTap: () {
+                    changePage(MyApp.HOME, shouldOff: true);
+                    controller.homeScrollOffset = 0;
+                  },
+                  child: Row(
+                    children: [
+                      Image.asset('assets/images/podo_logo.png', width: 100, height: 50),
+                      MyWidgets().getText('Podo Korean', isBold: true),
+                    ],
+                  ),
                 ),
-                MediaQuery.of(context).size.width < 850
-                    ? const SizedBox.shrink()
-                    : Row(
-                        children: getMenu(context),
-                      )
-              ],
-            ),
+              ),
+              const SizedBox(width: 20),
+              MediaQuery.of(context).size.width < 850
+                  ? const SizedBox.shrink()
+                  : Row(
+                      children: getMenu(context),
+                    )
+            ],
           ),
         ),
       ),
-      body: SingleChildScrollView(controller: controller.sc, child: pages[controller.selectedIndex]),
+      body: SingleChildScrollView(
+        controller: sc,
+        child: getPage(),
+      ),
       drawer: MediaQuery.of(context).size.width < 850
           ? Drawer(
               child: ListView(children: [
-                getMenuTile(context, Icons.home, "main_1", 0),
-                getMenuTile(context, Icons.history, "main_2", 1),
-                getMenuTile(context, Icons.app_shortcut_rounded, "main_3", 2),
-                getMenuTile(context, Icons.school_rounded, "main_4", 3),
-                getMenuTile(context, Icons.workspace_premium_rounded, "main_5", 4),
-                getMenuTile(context, Icons.library_books_rounded, "main_6", 5),
-                getMenuTile(context, Icons.email_rounded, "main_7", 6),
+                getMenuTile(context, Icons.home, MyApp.HOME),
+                getMenuTile(context, Icons.history, MyApp.BRAND_STORY),
+                getMenuTile(context, Icons.app_shortcut_rounded, MyApp.APP_PREVIEW),
+                getMenuTile(context, Icons.school_rounded, MyApp.CURRICULUM),
+                getMenuTile(context, Icons.workspace_premium_rounded, MyApp.PREMIUM),
+                getMenuTile(context, Icons.library_books_rounded, MyApp.BLOG),
+                getMenuTile(context, Icons.email_rounded, MyApp.CONTACT),
               ]),
             )
           : null,
@@ -221,20 +286,15 @@ class MainController extends GetxController {
   ScrollController sc = ScrollController();
   ScrollController mc = ScrollController();
   late Timer timer;
-  int selectedIndex = 0;
+  String selectedPage = MyApp.HOME;
   double homeScrollOffset = 0.0;
   double brandScrollOffset = 0.0;
+  bool showFreeWorkbook = true;
 
   @override
   void onInit() {
     super.onInit();
-    sc.addListener(() {
-      if (selectedIndex == 0) {
-        homeScrollOffset = sc.offset;
-      } else if (selectedIndex == 1) {
-        brandScrollOffset = sc.offset;
-      }
-    });
+    // Home의 리뷰를 왼쪽으로 흐르게 함
     timer = Timer.periodic(const Duration(milliseconds: 100), (timer) {
       if (mc.hasClients) {
         final maxScrollExtent = mc.position.maxScrollExtent;

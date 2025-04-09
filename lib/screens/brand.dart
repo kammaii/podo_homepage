@@ -63,7 +63,7 @@ Widget circleContainer({IconData? icon, double h = 50, double w = 50, Color bgCo
   );
 }
 
-Widget brand(BuildContext context, Function(int) changePage) {
+Widget brand(BuildContext context, Function(String) changePage) {
   return Column(
     children: [
       getContainer(

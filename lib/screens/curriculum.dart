@@ -42,7 +42,7 @@ Widget getCard(int index) {
   );
 }
 
-Widget curriculum(BuildContext context, Function(int) changePage) {
+Widget curriculum(BuildContext context, Function(String) changePage) {
   double w = MediaQuery.of(context).size.width;
   return Column(
     children: [

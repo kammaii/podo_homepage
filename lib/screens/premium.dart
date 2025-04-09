@@ -34,7 +34,7 @@ DataRow getDataRow(String title, Widget basic, Widget premium, {bool isLimited =
   ]);
 }
 
-Widget premium(BuildContext context, Function(int) changePage) {
+Widget premium(BuildContext context, Function(String) changePage) {
   return Column(
     children: [
       Container(

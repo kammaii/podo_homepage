@@ -152,7 +152,7 @@ Widget iconAndStoreBadge(BuildContext context, {required bool isRow}) {
   );
 }
 
-Widget preview(BuildContext context, Function(int) changePage) {
+Widget preview(BuildContext context, Function(String) changePage) {
   double w = MediaQuery.of(context).size.width;
 
   return GetBuilder<MainController>(builder: (controller) {

@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:podo_homepage/common/values.dart';
+import 'package:podo_homepage/main.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
@@ -187,7 +188,7 @@ class MyWidgets {
     );
   }
 
-  Widget footerRight(Function(int) changePage) {
+  Widget footerRight(Function(String) changePage) {
     return Column(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
@@ -197,16 +198,13 @@ class MyWidgets {
               runUrl('https://www.instagram.com/koreanwithpodo/');
             }, icon: const Icon(FontAwesomeIcons.instagram), color: Colors.white),
             IconButton(onPressed: () async {
-              runUrl('https://www.facebook.com/koreanwithpodo');
-            }, icon: const Icon(FontAwesomeIcons.facebook), color: Colors.white),
-            // IconButton(onPressed: () async {
-            //   runUrl('https://www.reddit.com/r/podokorean/?feed=home');
-            // }, icon: const Icon(FontAwesomeIcons.reddit), color: Colors.white),
+              runUrl('https://discord.gg/C2sq3zBS');
+            }, icon: const Icon(FontAwesomeIcons.discord), color: Colors.white),
             IconButton(onPressed: () async {
               runUrl('https://blog.podokorean.com');
             }, icon: const Icon(FontAwesomeIcons.blogger), color: Colors.white),
             IconButton(onPressed: () {
-              changePage(6);
+              changePage(MyApp.CONTACT);
             }, icon: const Icon(Icons.email), color: Colors.white),
           ],
         ),
@@ -216,7 +214,7 @@ class MyWidgets {
     );
   }
 
-  Widget footer (BuildContext context, Function(int) changePage) {
+  Widget footer (BuildContext context, Function(String) changePage) {
     return Container(
         color: darkPurple,
         child: Padding(

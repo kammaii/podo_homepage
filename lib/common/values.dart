@@ -10,14 +10,6 @@ const fontSizeMiddle = 20.0;
 
 
 const texts = {
-  "main_1": "Home",
-  "main_2": "Brand Story",
-  "main_3": "App Preview",
-  "main_4": "Curriculum",
-  "main_5": "Premium",
-  "main_6": "Blog",
-  "main_7": "Contact",
-
   "home_1":
   "Are you a serious Korean learner?\nYou've come to the right place!",
   "home_2":

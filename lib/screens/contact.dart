@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:podo_homepage/common/my_widgets.dart';
 import 'package:podo_homepage/common/values.dart';
+import 'package:podo_homepage/main.dart';
 import 'package:podo_homepage/screens/premium.dart';
 import 'package:http/http.dart' as http;
 
@@ -54,7 +55,7 @@ void emailSent(String title, String content) {
   );
 }
 
-Widget contact(BuildContext context, Function(int) changePage) {
+Widget contact(BuildContext context, Function(String) changePage) {
   double w = MediaQuery.of(context).size.width;
 
   return Column(
@@ -108,7 +109,7 @@ Widget contact(BuildContext context, Function(int) changePage) {
                         if (response.statusCode == 200) {
                           print('이메일 전송 완료');
                           emailSent(texts["contact_9"]!, texts["contact_10"]!);
-                          changePage(0);
+                          changePage(MyApp.HOME);
                         } else {
                           print('오류 발생: ${response.statusCode}');
                           emailSent(texts["contact_11"]!, texts["${response.statusCode}"]!);

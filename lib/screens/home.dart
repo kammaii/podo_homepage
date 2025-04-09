@@ -174,7 +174,7 @@ closePanels() {
   }
 }
 
-Widget home(BuildContext context, Function(int) changePage) {
+Widget home(BuildContext context, Function(String) changePage) {
   return Column(
     children: [
       getContainer(
@@ -341,7 +341,7 @@ Widget home(BuildContext context, Function(int) changePage) {
               ElevatedButton(
                   style: ElevatedButton.styleFrom(backgroundColor: darkPurple, elevation: 5),
                   onPressed: () {
-                    changePage(2);
+                    changePage(MyApp.APP_PREVIEW);
                   },
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
@@ -410,14 +410,14 @@ Widget home(BuildContext context, Function(int) changePage) {
                     children: [
                       faqPanel(faqItems[0]),
                       faqPanel(faqItems[1], linkTitle: texts["home_56"], fn: () {
-                        changePage(1);
+                        changePage(MyApp.BRAND_STORY);
                       }),
                       faqPanel(faqItems[2], linkTitle: texts["home_56"], fn: () {
-                        changePage(1);
+                        changePage(MyApp.BRAND_STORY);
                       }),
                       faqPanel(faqItems[3]),
                       faqPanel(faqItems[4], linkTitle: texts["home_57"], fn: () {
-                        changePage(4);
+                        changePage(MyApp.PREMIUM);
                       }),
                     ],
                   ),
@@ -431,7 +431,7 @@ Widget home(BuildContext context, Function(int) changePage) {
                   widthSpace,
                   IconButton(
                       onPressed: () {
-                        changePage(6);
+                        changePage(MyApp.CONTACT);
                       },
                       icon: const Icon(Icons.arrow_circle_right_outlined, color: darkPurple)),
                 ],
