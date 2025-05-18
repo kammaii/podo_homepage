@@ -1,22 +1,24 @@
 import 'dart:async';
+import 'package:firebase_analytics/firebase_analytics.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:firebase_core/firebase_core.dart';
-import 'package:flutter/widgets.dart';
+import 'package:flutter_web_plugins/url_strategy.dart';
+import 'package:get/get.dart';
 import 'package:podo_homepage/common/my_widgets.dart';
 import 'package:podo_homepage/common/values.dart';
+import 'package:podo_homepage/common/welcome_email.dart';
 import 'package:podo_homepage/screens/brand.dart';
 import 'package:podo_homepage/screens/contact.dart';
 import 'package:podo_homepage/screens/curriculum.dart';
 import 'package:podo_homepage/screens/home.dart';
 import 'package:podo_homepage/screens/premium.dart';
 import 'package:podo_homepage/screens/preview.dart';
+import 'package:responsive_framework/responsive_framework.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'firebase_options.dart';
-import 'package:responsive_framework/responsive_framework.dart';
-import 'package:get/get.dart';
-import 'package:firebase_analytics/firebase_analytics.dart';
-import 'package:flutter_web_plugins/url_strategy.dart';
+import 'dart:convert';
+import 'package:http/http.dart' as http;
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -77,6 +79,7 @@ class MyApp extends StatelessWidget {
         getPage(PREMIUM),
         getPage(BLOG),
         getPage(CONTACT),
+        GetPage(name: '/welcome', page: () => const WelcomeEmail(), transition: Transition.noTransition),
       ],
       initialRoute: '/',
     );
@@ -95,6 +98,7 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   final controller = Get.find<MainController>();
   ScrollController sc = ScrollController();
+  bool isLoading = false;
 
   void changePage(String title, {bool shouldOff = false}) {
     controller.selectedPage = title;
@@ -174,6 +178,169 @@ class _MyHomePageState extends State<MyHomePage> {
     }
   }
 
+  showWorkbookDownloadDialog(BuildContext context) {
+    final nameController = TextEditingController();
+    final emailController = TextEditingController();
+    bool agreedToEmails = false;
+    final emailRegex = RegExp(r"^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$");
+
+    showDialog(
+      context: context,
+      builder: (context) {
+        return StatefulBuilder(
+          builder: (context, setState) {
+            final isFormValid = nameController.text.isNotEmpty &&
+                emailController.text.isNotEmpty &&
+                emailRegex.hasMatch(emailController.text) &&
+                agreedToEmails;
+
+            return AlertDialog(
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+              contentPadding: const EdgeInsets.all(24),
+              content: SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Icon(CupertinoIcons.gift_fill, size: 60, color: darkPurple),
+                    const SizedBox(height: 16),
+
+                    // 큰 타이틀
+                    MyWidgets().getText('Get Your Free Hangul Workbook!',
+                        fontSize: 20, isBold: true, fontColor: darkPurple),
+
+                    // 부제목
+                    const SizedBox(height: 8),
+                    MyWidgets().getText(
+                      'Start learning Korean the fun and easy way',
+                      fontColor: Colors.grey,
+                    ),
+                    const SizedBox(height: 24),
+
+                    // 이름 입력
+                    TextField(
+                      controller: nameController,
+                      decoration: const InputDecoration(
+                        labelText: 'Name',
+                        border: OutlineInputBorder(),
+                      ),
+                      onChanged: (_) => setState(() {}),
+                    ),
+                    const SizedBox(height: 16),
+
+                    // 이메일 입력
+                    TextField(
+                      controller: emailController,
+                      decoration: const InputDecoration(
+                        labelText: 'Email',
+                        border: OutlineInputBorder(),
+                      ),
+                      keyboardType: TextInputType.emailAddress,
+                      onChanged: (_) => setState(() {}),
+                    ),
+                    const SizedBox(height: 16),
+
+                    // 이메일 수신 동의 체크박스
+                    Row(
+                      children: [
+                        Checkbox(
+                          value: agreedToEmails,
+                          onChanged: (value) {
+                            setState(() {
+                              agreedToEmails = value ?? false;
+                            });
+                          },
+                          activeColor: darkPurple,
+                        ),
+                        Expanded(
+                          child: MyWidgets().getText(
+                            'I agree to receive emails from Podo Korean.',
+                            fontSize: 13,
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 16),
+
+                    // 버튼
+                    isLoading
+                        ? const CircularProgressIndicator()
+                        : SizedBox(
+                            width: double.infinity,
+                            child: ElevatedButton.icon(
+                              icon: const Icon(Icons.send),
+                              label: const Text('Send My Workbook'),
+                              onPressed: isFormValid
+                                  ? () async {
+                                      setState(() {
+                                        isLoading = true;
+                                      });
+                                      final name = nameController.text;
+                                      final email = emailController.text;
+
+                                      final response = await http.post(
+                                        Uri.parse(
+                                            'https://us-central1-podo-49335.cloudfunctions.net/onAddContactToZoho'),
+                                        headers: {
+                                          'Content-Type': 'application/x-www-form-urlencoded',
+                                        },
+                                        body: {
+                                          'email': email,
+                                          'name': name,
+                                          'source': 'website',
+                                        },
+                                      );
+                                      isLoading = false;
+                                      Get.back();
+                                      if (response.statusCode == 200) {
+                                        print('성공');
+                                        Get.dialog(AlertDialog(
+                                          title: const Text('Success'),
+                                          content: const Text('Please check your inbox.'),
+                                          actions: [
+                                            TextButton(onPressed: () => Get.back(), child: const Text('OK'))
+                                          ],
+                                        ));
+                                      } else {
+                                        print('오류 발생: ${response.statusCode}');
+                                        String msg = json.decode(response.body)['message'];
+                                        Get.dialog(AlertDialog(
+                                          title: const Text('Failed'),
+                                          content: Text(msg),
+                                          actions: [
+                                            TextButton(onPressed: () => Get.back(), child: const Text('OK'))
+                                          ],
+                                        ));
+                                      }
+                                    }
+                                  : null,
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: isFormValid ? darkPurple : Colors.grey.shade300,
+                                foregroundColor: isFormValid ? Colors.white : Colors.grey.shade700,
+                                padding: const EdgeInsets.symmetric(vertical: 14),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                              ),
+                            ),
+                          ),
+
+                    const SizedBox(height: 8),
+
+                    // 보조 설명
+                    Text(
+                      'Immediate download. No sign-up required.',
+                      style: TextStyle(fontSize: 12, color: Colors.grey[600]),
+                      textAlign: TextAlign.center,
+                    ),
+                  ],
+                ),
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -226,6 +393,73 @@ class _MyHomePageState extends State<MyHomePage> {
       }
     });
 
+    String freeWorkbookTitle = 'Get your FREE Hangul Workbook';
+    String freeWorkbookSubTitle = 'Start learning Korean with the beauty of Hangul';
+    String freeWorkbookBtn = 'Get Now!';
+
+    Widget freeWorkbookWidget = Container(
+      color: const Color(0xFFFFEB3B),
+      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          const Icon(CupertinoIcons.gift_fill, color: Color(0xffF74A30), size: 40),
+          const SizedBox(width: 10),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              MyWidgets().getText(freeWorkbookTitle, fontSize: 18, isBold: true),
+              MyWidgets().getText(freeWorkbookSubTitle),
+            ],
+          ),
+          const SizedBox(width: 15),
+          ElevatedButton(
+            onPressed: () {
+              showWorkbookDownloadDialog(context);
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: const Color(0xFFD81B60),
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+            ),
+            child: MyWidgets().getText(freeWorkbookBtn, fontColor: Colors.white, isBold: true),
+          )
+        ],
+      ),
+    );
+    if (MediaQuery.of(context).size.width < 850) {
+      freeWorkbookWidget = Container(
+        color: const Color(0xFFFFEB3B),
+        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Column(
+              children: [
+                MyWidgets().getText(freeWorkbookTitle, fontSize: 18, isBold: true),
+                MyWidgets().getText(freeWorkbookSubTitle),
+                const SizedBox(height: 15),
+                ElevatedButton(
+                  onPressed: () {
+                    showWorkbookDownloadDialog(context);
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFFD81B60),
+                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                  child: MyWidgets().getText(freeWorkbookBtn, fontColor: Colors.white, isBold: true),
+                ),
+              ],
+            ),
+          ],
+        ),
+      );
+    }
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -263,7 +497,12 @@ class _MyHomePageState extends State<MyHomePage> {
       ),
       body: SingleChildScrollView(
         controller: sc,
-        child: getPage(),
+        child: Column(
+          children: [
+            controller.showFreeWorkbook ? freeWorkbookWidget : const SizedBox.shrink(),
+            getPage(),
+          ],
+        ),
       ),
       drawer: MediaQuery.of(context).size.width < 850
           ? Drawer(
@@ -289,7 +528,7 @@ class MainController extends GetxController {
   String selectedPage = MyApp.HOME;
   double homeScrollOffset = 0.0;
   double brandScrollOffset = 0.0;
-  bool showFreeWorkbook = true;
+  bool showFreeWorkbook = false;
 
   @override
   void onInit() {
