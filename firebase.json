@@ -12,6 +12,13 @@
     }
   },
   "hosting": {
+    "headers": [ {
+      "source": "https://us-central1-podo-49335.cloudfunctions.net/onAddContactToZoho",
+      "headers": [ {
+        "key": "Access-Control-Allow-Origin",
+        "value": "*"
+      } ]
+    } ],
     "target": "podo-homepage",
     "public": "build/web",
     "ignore": [
@@ -27,6 +34,10 @@
       {
         "source": "/privacyPolicy.html",
         "destination": "/privacyPolicy.html"
+      },
+      {
+        "source": "/termsOfUse.html",
+        "destination": "/termsOfUse.html"
       }
     ]
   }

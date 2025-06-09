@@ -7,7 +7,7 @@ import 'package:flutter_web_plugins/url_strategy.dart';
 import 'package:get/get.dart';
 import 'package:podo_homepage/common/my_widgets.dart';
 import 'package:podo_homepage/common/values.dart';
-import 'package:podo_homepage/common/welcome_email.dart';
+import 'package:podo_homepage/common/add_contact.dart';
 import 'package:podo_homepage/screens/brand.dart';
 import 'package:podo_homepage/screens/contact.dart';
 import 'package:podo_homepage/screens/curriculum.dart';
@@ -79,7 +79,7 @@ class MyApp extends StatelessWidget {
         getPage(PREMIUM),
         getPage(BLOG),
         getPage(CONTACT),
-        GetPage(name: '/welcome', page: () => const WelcomeEmail(), transition: Transition.noTransition),
+        GetPage(name: '/add_contact', page: () => const AddContact(), transition: Transition.noTransition),
       ],
       initialRoute: '/',
     );
@@ -123,11 +123,6 @@ class _MyHomePageState extends State<MyHomePage> {
             if (title == MyApp.BLOG) {
               openBlog();
             } else {
-              if (title == MyApp.HOME || title == MyApp.BRAND_STORY || title == MyApp.APP_PREVIEW) {
-                controller.showFreeWorkbook = true;
-              } else {
-                controller.showFreeWorkbook = false;
-              }
               changePage(title, shouldOff: true);
             }
           },
