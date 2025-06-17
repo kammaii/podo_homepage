@@ -59,7 +59,7 @@ class DefaultFirebaseOptions {
     projectId: 'podo-49335',
     authDomain: 'podo-49335.firebaseapp.com',
     storageBucket: 'podo-49335.appspot.com',
-    measurementId: 'G-5RL1NL4E5D',
+    measurementId: 'G-TJWQJ3XEW6',
   );
 
 }

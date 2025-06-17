@@ -38,6 +38,10 @@
       {
         "source": "/termsOfUse.html",
         "destination": "/termsOfUse.html"
+      },
+      {
+        "source": "/thankyou.html",
+        "destination": "/thankyou.html"
       }
     ]
   }

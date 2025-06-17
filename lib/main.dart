@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -19,6 +18,7 @@ import 'package:url_launcher/url_launcher.dart';
 import 'firebase_options.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'dart:js' as js;
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -43,7 +43,6 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    FirebaseAnalytics.instance;
 
     GetPage getPage(String name) {
       String routeName = name.replaceAll(' ', '').toLowerCase();
@@ -100,8 +99,14 @@ class _MyHomePageState extends State<MyHomePage> {
   ScrollController sc = ScrollController();
   bool isLoading = false;
 
+  void logEvent(String name, Map<String, dynamic> params) {
+    final jsParams = js.JsObject.jsify(params);
+    js.context.callMethod('gtag', ['event', name, jsParams]);
+  }
+
   void changePage(String title, {bool shouldOff = false}) {
     controller.selectedPage = title;
+    logEvent('view_menu', {'title': title});
     String route = title.replaceAll(' ', '').toLowerCase();
     route = '/$route';
     if (title == MyApp.HOME) {
@@ -285,16 +290,12 @@ class _MyHomePageState extends State<MyHomePage> {
                                         },
                                       );
                                       isLoading = false;
+
                                       Get.back();
                                       if (response.statusCode == 200) {
                                         print('성공');
-                                        Get.dialog(AlertDialog(
-                                          title: const Text('Success'),
-                                          content: const Text('Please check your inbox.'),
-                                          actions: [
-                                            TextButton(onPressed: () => Get.back(), child: const Text('OK'))
-                                          ],
-                                        ));
+                                        logEvent('submit_contact_form', {'email': email, 'name': name});
+                                        launchUrl(Uri.parse('https://www.podokorean.com/thankyou.html'));
                                       } else {
                                         print('오류 발생: ${response.statusCode}');
                                         String msg = json.decode(response.body)['message'];
@@ -410,6 +411,7 @@ class _MyHomePageState extends State<MyHomePage> {
           const SizedBox(width: 15),
           ElevatedButton(
             onPressed: () {
+              logEvent('open_workbook_dialog', {});
               showWorkbookDownloadDialog(context);
             },
             style: ElevatedButton.styleFrom(
@@ -438,6 +440,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 const SizedBox(height: 15),
                 ElevatedButton(
                   onPressed: () {
+                    logEvent('open_workbook_dialog', {});
                     showWorkbookDownloadDialog(context);
                   },
                   style: ElevatedButton.styleFrom(
@@ -523,7 +526,7 @@ class MainController extends GetxController {
   String selectedPage = MyApp.HOME;
   double homeScrollOffset = 0.0;
   double brandScrollOffset = 0.0;
-  bool showFreeWorkbook = false;
+  bool showFreeWorkbook = true;
 
   @override
   void onInit() {

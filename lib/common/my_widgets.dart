@@ -198,7 +198,7 @@ class MyWidgets {
               runUrl('https://www.instagram.com/koreanwithpodo/');
             }, icon: const Icon(FontAwesomeIcons.instagram), color: Colors.white),
             IconButton(onPressed: () async {
-              runUrl('https://discord.gg/C2sq3zBS');
+              runUrl('https://discord.gg/CGpVJvGFXj');
             }, icon: const Icon(FontAwesomeIcons.discord), color: Colors.white),
             IconButton(onPressed: () async {
               runUrl('https://blog.podokorean.com');
