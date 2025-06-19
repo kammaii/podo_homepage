@@ -19,6 +19,7 @@ import 'firebase_options.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'dart:js' as js;
+import 'dart:html' as html;
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -98,6 +99,23 @@ class _MyHomePageState extends State<MyHomePage> {
   final controller = Get.find<MainController>();
   ScrollController sc = ScrollController();
   bool isLoading = false;
+  String source = 'website';
+
+
+
+  @override
+  void initState() {
+    super.initState();
+    final uri = Uri.parse(html.window.location.href);
+    final shouldShowDialog = uri.queryParameters['showDialog'] == 'true';
+
+    if(shouldShowDialog) {
+      source = uri.queryParameters['source'] ?? 'website';
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        showWorkbookDownloadDialog();
+      });
+    }
+  }
 
   void logEvent(String name, Map<String, dynamic> params) {
     final jsParams = js.JsObject.jsify(params);
@@ -178,164 +196,159 @@ class _MyHomePageState extends State<MyHomePage> {
     }
   }
 
-  showWorkbookDownloadDialog(BuildContext context) {
+  showWorkbookDownloadDialog() {
     final nameController = TextEditingController();
     final emailController = TextEditingController();
     bool agreedToEmails = false;
     final emailRegex = RegExp(r"^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$");
 
-    showDialog(
-      context: context,
-      builder: (context) {
-        return StatefulBuilder(
-          builder: (context, setState) {
-            final isFormValid = nameController.text.isNotEmpty &&
-                emailController.text.isNotEmpty &&
-                emailRegex.hasMatch(emailController.text) &&
-                agreedToEmails;
+    Get.dialog(StatefulBuilder(
+      builder: (context, setState) {
+        final isFormValid = nameController.text.isNotEmpty &&
+            emailController.text.isNotEmpty &&
+            emailRegex.hasMatch(emailController.text) &&
+            agreedToEmails;
 
-            return AlertDialog(
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-              contentPadding: const EdgeInsets.all(24),
-              content: SingleChildScrollView(
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
+        return AlertDialog(
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+          contentPadding: const EdgeInsets.all(24),
+          content: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Icon(CupertinoIcons.gift_fill, size: 60, color: darkPurple),
+                const SizedBox(height: 16),
+
+                // 큰 타이틀
+                MyWidgets().getText('Get Your Free Hangul Workbook!',
+                    fontSize: 20, isBold: true, fontColor: darkPurple),
+
+                // 부제목
+                const SizedBox(height: 8),
+                MyWidgets().getText(
+                  'Start learning Korean the fun and easy way',
+                  fontColor: Colors.grey,
+                ),
+                const SizedBox(height: 24),
+
+                // 이름 입력
+                TextField(
+                  controller: nameController,
+                  decoration: const InputDecoration(
+                    labelText: 'Name',
+                    border: OutlineInputBorder(),
+                  ),
+                  onChanged: (_) => setState(() {}),
+                ),
+                const SizedBox(height: 16),
+
+                // 이메일 입력
+                TextField(
+                  controller: emailController,
+                  decoration: const InputDecoration(
+                    labelText: 'Email',
+                    border: OutlineInputBorder(),
+                  ),
+                  keyboardType: TextInputType.emailAddress,
+                  onChanged: (_) => setState(() {}),
+                ),
+                const SizedBox(height: 16),
+
+                // 이메일 수신 동의 체크박스
+                Row(
                   children: [
-                    const Icon(CupertinoIcons.gift_fill, size: 60, color: darkPurple),
-                    const SizedBox(height: 16),
-
-                    // 큰 타이틀
-                    MyWidgets().getText('Get Your Free Hangul Workbook!',
-                        fontSize: 20, isBold: true, fontColor: darkPurple),
-
-                    // 부제목
-                    const SizedBox(height: 8),
-                    MyWidgets().getText(
-                      'Start learning Korean the fun and easy way',
-                      fontColor: Colors.grey,
+                    Checkbox(
+                      value: agreedToEmails,
+                      onChanged: (value) {
+                        setState(() {
+                          agreedToEmails = value ?? false;
+                        });
+                      },
+                      activeColor: darkPurple,
                     ),
-                    const SizedBox(height: 24),
-
-                    // 이름 입력
-                    TextField(
-                      controller: nameController,
-                      decoration: const InputDecoration(
-                        labelText: 'Name',
-                        border: OutlineInputBorder(),
+                    Expanded(
+                      child: MyWidgets().getText(
+                        'I agree to receive emails from Podo Korean.',
+                        fontSize: 13,
                       ),
-                      onChanged: (_) => setState(() {}),
-                    ),
-                    const SizedBox(height: 16),
-
-                    // 이메일 입력
-                    TextField(
-                      controller: emailController,
-                      decoration: const InputDecoration(
-                        labelText: 'Email',
-                        border: OutlineInputBorder(),
-                      ),
-                      keyboardType: TextInputType.emailAddress,
-                      onChanged: (_) => setState(() {}),
-                    ),
-                    const SizedBox(height: 16),
-
-                    // 이메일 수신 동의 체크박스
-                    Row(
-                      children: [
-                        Checkbox(
-                          value: agreedToEmails,
-                          onChanged: (value) {
-                            setState(() {
-                              agreedToEmails = value ?? false;
-                            });
-                          },
-                          activeColor: darkPurple,
-                        ),
-                        Expanded(
-                          child: MyWidgets().getText(
-                            'I agree to receive emails from Podo Korean.',
-                            fontSize: 13,
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 16),
-
-                    // 버튼
-                    isLoading
-                        ? const CircularProgressIndicator()
-                        : SizedBox(
-                            width: double.infinity,
-                            child: ElevatedButton.icon(
-                              icon: const Icon(Icons.send),
-                              label: const Text('Send My Workbook'),
-                              onPressed: isFormValid
-                                  ? () async {
-                                      setState(() {
-                                        isLoading = true;
-                                      });
-                                      final name = nameController.text;
-                                      final email = emailController.text;
-
-                                      final response = await http.post(
-                                        Uri.parse(
-                                            'https://us-central1-podo-49335.cloudfunctions.net/onAddContactToZoho'),
-                                        headers: {
-                                          'Content-Type': 'application/x-www-form-urlencoded',
-                                        },
-                                        body: {
-                                          'email': email,
-                                          'name': name,
-                                          'source': 'website',
-                                        },
-                                      );
-                                      isLoading = false;
-
-                                      Get.back();
-                                      if (response.statusCode == 200) {
-                                        print('성공');
-                                        logEvent('submit_contact_form', {'email': email, 'name': name});
-                                        launchUrl(Uri.parse('https://www.podokorean.com/thankyou.html'));
-                                      } else {
-                                        print('오류 발생: ${response.statusCode}');
-                                        String msg = json.decode(response.body)['message'];
-                                        Get.dialog(AlertDialog(
-                                          title: const Text('Failed'),
-                                          content: Text(msg),
-                                          actions: [
-                                            TextButton(onPressed: () => Get.back(), child: const Text('OK'))
-                                          ],
-                                        ));
-                                      }
-                                    }
-                                  : null,
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: isFormValid ? darkPurple : Colors.grey.shade300,
-                                foregroundColor: isFormValid ? Colors.white : Colors.grey.shade700,
-                                padding: const EdgeInsets.symmetric(vertical: 14),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(12),
-                                ),
-                              ),
-                            ),
-                          ),
-
-                    const SizedBox(height: 8),
-
-                    // 보조 설명
-                    Text(
-                      'Immediate download. No sign-up required.',
-                      style: TextStyle(fontSize: 12, color: Colors.grey[600]),
-                      textAlign: TextAlign.center,
                     ),
                   ],
                 ),
-              ),
-            );
-          },
+                const SizedBox(height: 16),
+
+                // 버튼
+                isLoading
+                    ? const CircularProgressIndicator()
+                    : SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton.icon(
+                    icon: const Icon(Icons.send),
+                    label: const Text('Send My Workbook'),
+                    onPressed: isFormValid
+                        ? () async {
+                      setState(() {
+                        isLoading = true;
+                      });
+                      final name = nameController.text;
+                      final email = emailController.text;
+
+                      final response = await http.post(
+                        Uri.parse(
+                            'https://us-central1-podo-49335.cloudfunctions.net/onAddContactToZoho'),
+                        headers: {
+                          'Content-Type': 'application/x-www-form-urlencoded',
+                        },
+                        body: {
+                          'email': email,
+                          'name': name,
+                          'source': source,
+                        },
+                      );
+                      isLoading = false;
+
+                      Get.back();
+                      if (response.statusCode == 200) {
+                        print('성공');
+                        logEvent('submit_contact_form', {'email': email, 'name': name});
+                        launchUrl(Uri.parse('https://www.podokorean.com/thankyou.html'));
+                      } else {
+                        print('오류 발생: ${response.statusCode}');
+                        String msg = json.decode(response.body)['message'];
+                        Get.dialog(AlertDialog(
+                          title: const Text('Failed'),
+                          content: Text(msg),
+                          actions: [
+                            TextButton(onPressed: () => Get.back(), child: const Text('OK'))
+                          ],
+                        ));
+                      }
+                    }
+                        : null,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: isFormValid ? darkPurple : Colors.grey.shade300,
+                      foregroundColor: isFormValid ? Colors.white : Colors.grey.shade700,
+                      padding: const EdgeInsets.symmetric(vertical: 14),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                  ),
+                ),
+
+                const SizedBox(height: 8),
+
+                // 보조 설명
+                Text(
+                  'Immediate download. No sign-up required.',
+                  style: TextStyle(fontSize: 12, color: Colors.grey[600]),
+                  textAlign: TextAlign.center,
+                ),
+              ],
+            ),
+          ),
         );
       },
-    );
+    ));
   }
 
   @override
@@ -412,7 +425,7 @@ class _MyHomePageState extends State<MyHomePage> {
           ElevatedButton(
             onPressed: () {
               logEvent('open_workbook_dialog', {});
-              showWorkbookDownloadDialog(context);
+              showWorkbookDownloadDialog();
             },
             style: ElevatedButton.styleFrom(
               backgroundColor: const Color(0xFFD81B60),
@@ -441,7 +454,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 ElevatedButton(
                   onPressed: () {
                     logEvent('open_workbook_dialog', {});
-                    showWorkbookDownloadDialog(context);
+                    showWorkbookDownloadDialog();
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFFD81B60),
